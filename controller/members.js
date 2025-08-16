@@ -4,6 +4,7 @@ const User = db.User
 const { Op } = require('sequelize');
 
 //Create
+
 const createUser = async (req, res) => {
     try {
         const { firstName, lastName, email, password } = req.body
@@ -37,15 +38,15 @@ const readUser = async (req, res) => {
         let offset = (page - 1) * pageSize;
 
         const whereCondition = search
-        ? { email: { [Op.like]: `%${search}%` } }
-        : {};
-        
+            ? { email: { [Op.like]: `%${search}%` } }
+            : {};
+
         //with searching
         const users = await User.findAndCountAll({
-            where : whereCondition,
-            limit : pageSize,
+            where: whereCondition,
+            limit: pageSize,
             offset: offset,
-            attribute: {exclude: ['password']}
+            attribute: { exclude: ['password'] }
         });
 
         res.status(200).json({
@@ -55,21 +56,22 @@ const readUser = async (req, res) => {
         })
 
     } catch (error) {
-    console.error("Error reading user", error)
-    res.status(500).json({message: "Failed to get users"})
-}}
+        console.error("Error reading user", error)
+        res.status(500).json({ message: "Failed to get users" })
+    }
+}
 
 
 //update
-const updateUser = async(req,res) => {
-    try{
-        const {id, firstName, lastName, email} = req.body;
+const updateUser = async (req, res) => {
+    try {
+        const { id, firstName, lastName, email } = req.body;
 
         const user = await User.findByPk(id)
         //console.log("************************",user)
-        if(!user){
+        if (!user) {
             console.log("User not found")
-            return res.status(404).json({message: "User not found"})
+            return res.status(404).json({ message: "User not found" })
         }
 
         user.firstName = firstName || user.firstName;
@@ -80,28 +82,28 @@ const updateUser = async(req,res) => {
         const userData = user.toJSON();
         delete userData.password;
 
-        return res.status(200).json({message: "User updated successfully", user: userData})
+        return res.status(200).json({ message: "User updated successfully", user: userData })
 
-    }catch(error){
+    } catch (error) {
         console.log("error updating a user");
-        return res.status(500).json({message: "error updating a user",error})
+        return res.status(500).json({ message: "error updating a user", error })
     }
 };
 
 //delete
-const deleteUser = async( req, res) => {
-    try{
-        const{id} = req.body;
+const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.body;
         const user = await User.findByPk(id);
 
-        if(!user){
-            return res.status(404).json({message: "User not found"})
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
         }
         await user.destroy();
-        return res.status(200).json({message: "User deleted successfully"})
-    }catch(error){
+        return res.status(200).json({ message: "User deleted successfully" })
+    } catch (error) {
         console.error("error deleting the user")
-        return res.status(500).json({message: "error deleting the user"})
+        return res.status(500).json({ message: "error deleting the user" })
     }
 }
 
